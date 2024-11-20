@@ -1,5 +1,27 @@
 <?php 
 
+function validate_and_login_user($email, $password) {
+    $connection = database_connection();
+    $password_hash = md5($password);
+
+    $query = "SELECT * FROM users WHERE email = ? AND password = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param('ss', $email, $password_hash);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['name'] = $user['name'];
+        $_SESSION['email'] = $user['email'];
+        return $user;
+    }
+
+    return false;
+}
+
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
