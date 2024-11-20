@@ -44,7 +44,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     <div class="d-flex align-items-center justify-content-center vh-100">
         <div class="col-3">
             
-            <!-- Display Validation Errors -->
+                   <!-- Display Validation Errors -->
+                   <?php if (!empty($validation_errors)): ?>
+                <?php echo render_alerts($validation_errors, 'danger'); ?>
+            <?php endif; ?>
+
+            <!-- Display Success Message -->
+            <?php if (!empty($success_message)): ?>
+                <?php echo render_alerts([$success_message], 'success'); ?>
+            <?php endif; ?>
             
 
             <!-- Login Form -->
