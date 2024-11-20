@@ -194,4 +194,34 @@ function handleEditSubject($subject_id) {
     return $subject;
 }
 
+function deleteSubject($subject_id) {
+    $connection = database_connection();
+    $query = "SELECT * FROM subjects WHERE id = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param('i', $subject_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $subject = $result->fetch_assoc();
+
+    if (!$subject) {
+        return ["error" => "Subject not found."];
+    } else {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_subject'])) {
+            $delete_query = "DELETE FROM subjects WHERE id = ?";
+            $delete_stmt = $connection->prepare($delete_query);
+            $delete_stmt->bind_param('i', $subject_id);
+
+            if ($delete_stmt->execute()) {
+                header("Location: /admin/subjects/add.php");
+                exit();
+            } else {
+                return ["error" => "Failed to delete the subject: " . $connection->error];
+            }
+        }
+    }
+
+    return ["subject" => $subject];
+}
+
+
 ?>
