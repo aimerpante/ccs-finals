@@ -44,8 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
     <div class="d-flex align-items-center justify-content-center vh-100">
         <div class="col-3">
             
-                   <!-- Display Validation Errors -->
-                   <?php if (!empty($validation_errors)): ?>
+             <!-- Display Validation Errors -->
+            <?php if (!empty($validation_errors)): ?>
                 <?php echo render_alerts($validation_errors, 'danger'); ?>
             <?php endif; ?>
 
