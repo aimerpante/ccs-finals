@@ -147,4 +147,51 @@ function renderAlert($messages, $type = 'danger') {
     return $html;
 }
 
+
+function handleEditSubject($subject_id) {
+    $connection = database_connection();
+    $query = "SELECT * FROM subjects WHERE id = ?";
+    $stmt = $connection->prepare($query);
+    $stmt->bind_param('i', $subject_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $subject = $result->fetch_assoc();
+
+    if (!$subject) {
+        return "Subject not found.";
+    } else {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_subject'])) {
+            $subject_name = trim($_POST['subject_name']);
+            $subject_code = trim($_POST['subject_code']);
+
+            if (empty($subject_name)) {
+                return "Subject name cannot be empty.";
+            } else {
+                $duplicate_query = "SELECT * FROM subjects WHERE (subject_name = ? OR subject_code = ?) AND id != ?";
+                $duplicate_stmt = $connection->prepare($duplicate_query);
+                $duplicate_stmt->bind_param('ssi', $subject_name, $subject_code, $subject_id);
+                $duplicate_stmt->execute();
+                $duplicate_result = $duplicate_stmt->get_result();
+
+                if ($duplicate_result->num_rows > 0) {
+                    return "A subject with the same name or code already exists.";
+                } else {
+                    $update_query = "UPDATE subjects SET subject_name = ?, subject_code = ? WHERE id = ?";
+                    $update_stmt = $connection->prepare($update_query);
+                    $update_stmt->bind_param('ssi', $subject_name, $subject_code, $subject_id);
+
+                    if ($update_stmt->execute()) {
+                        header("Location: /admin/subjects/add.php?message=Subject+updated+successfully");
+                        exit();
+                    } else {
+                        return "Failed to update the subject. Please try again.";
+                    }
+                }
+            }
+        }
+    }
+
+    return $subject;
+}
+
 ?>
